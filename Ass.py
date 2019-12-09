@@ -1,32 +1,43 @@
 import simpy
 #import random
 import numpy.random as random
+import scipy.stats as ss
+import math
 import matplotlib.pyplot as plt
 ''' ------------------------ '''
 ''' Parameters               '''
 ''' ------------------------ '''
 'Max Simulation Time'
-MAXSIMTIME = 4000 
+MAXSIMTIME = 5000 
 ' "True"  Print to terminal'
 VERBOSE = False 
+'Queue Changing Rate'
 P11 = 0.2
 P12 = 1-P11
+'Original Arrival & Service Rate'
 LAMBDA = 6.0
 MU1 = 11.0
 MU2 = 14.0
+'Fixed Arrival Rate'
 LAMBDA1 = LAMBDA/P12
 LAMBDA2 = LAMBDA
+'------------'
 POPULATION = 50000000
 SERVICE_DISCIPLINE = 'FIFO'
+'Open file to Write or Not'
 LOGGED = True
 'Probability Job Queue has more than ProN job(s)'
 ProN = 4.0 
 'Number of Replications'
-REPS = 10.0 
+REPS = 10
 'Identify the knee'
-kneeDeltaRate = 0.005 
+kneeDeltaRate = 0.00005 
 INTER_SERVICE_TIME_1 = 1/MU1
 INTER_SERVICE_TIME_2 = 1/MU2
+'Convenience Level'
+Confidence = 0.95
+alpha = 1 - Confidence 
+
 
 
 ''' ------------------------ '''
@@ -192,10 +203,6 @@ class Server2:
                     j = self.Jobs.pop( 0 )
                 self.queuelength.append(len(self.Jobs))
                 self.queuetime.append(env.now)
-                '''if LOGGED:
-                    qlog.write( '%.4f\t%d\t%d\n'
-                        % (self.env.now, 1 if len(self.Jobs)>0 else 0, len(self.Jobs)) )'''
-
                 ''' sum up the waiting time'''
                 self.waitingTime += self.env.now - j.arrtime
                 ''' yield an event for the job finish'''
@@ -241,111 +248,173 @@ class JobGenerator:
             if not self.server.serversleeping.triggered:
                 self.server.serversleeping.interrupt( 'Wake up, please.' )
 
-'''Transient Remove'''
-EnvReps = list(())
-QueueLenRepsList = list(())
-QueueTimeRepsList = list(())
-MyServer2 = list(())
-MyServer = list(())
-MyJobGeneration = list(())
-MeanJlength  = list(())
-MeanJtime    = list(())
-MeanLlength  = list(())
-MeanLtime    = list(())
-RateMeanL     = list(())
-RateMeanLtime = list(())
-timeList = list(())
-MeanOverall = 0.0
-MeanLdel = 0.0
-minRepsLen = 0.0
+
 kneePos = 0
-i = 0
-while(i < 10):
-    EnvReps.append(simpy.Environment())
-    MyServer2.append(Server2( EnvReps[i], SERVICE_DISCIPLINE ))
-    MyServer.append(Server( EnvReps[i],MyServer2[i], SERVICE_DISCIPLINE,MU1 ,MU2 ))
-    MyJobGeneration.append(JobGenerator( EnvReps[i], MyServer[i], POPULATION, LAMBDA, MU1 ))
-    env = EnvReps[i]
-    env.run(until = MAXSIMTIME)
-    QueueLenRepsList.append(MyServer[i].systemJob)
-    QueueTimeRepsList.append(MyServer[i].queuetime)
-    print('%d' %len(MyServer[i].queuetime))
-    MeanOverallRun = 0
-    if i == 0:
-        minRepsLen = len(MyServer[0].queuetime)
-        t = 0
-        while (t < minRepsLen) :
-            MeanJlength.append(MyServer[0].systemJob[t])
-            MeanJtime.append(MyServer[0].queuetime[t])
-            t += 1
-    else:
-        if (len(MyServer[i].queuetime) < minRepsLen) :
-            minRepsLen = len(MyServer[i].queuetime)
-        t = 0
-        while (t < minRepsLen) :
-            MeanJlength[t] += MyServer[i].systemJob[t]
-            t += 1
-    i += 1
-'''-----------MEAN OVERALL------------'''
-i = 0
-while i < minRepsLen :
-    MeanOverallRun += MeanJlength[i]
-    MeanJlength[i] = MeanJlength[i]*0.1
-    i += 1
-'---------------------------------------'
-MeanOverall = MeanOverallRun*1.0/(minRepsLen*REPS)    
-'----------------------------------------'
-print('%d' %minRepsLen)
-if LOGGED:
-    qlog = open( 'mm1-l%d-m%d.csv' % (LAMBDA,MU1), 'w' )
-    qlog.write( '0\t0\t0\n' )
-'---MEAN DELETE FIRST L OBSERVATION(S)---'
-i = 0
-while i < minRepsLen - 1 :
-    '''if((RateMeanL[i]  - RateMeanL[i - 1])/(RateMeanLtime[i] - RateMeanLtime[i-1]) < kneeDeltaRate):
-        kneePos = i
-        break'''
-    MeanOverallRun -= MeanJlength[i]*10.0
-    MeanLlength.append(MeanOverallRun/(minRepsLen - i - 1))
-    qlog.write('%f\t' %(MeanJlength[i]))
-    RateMeanL.append((MeanLlength[i] - MeanOverall)/MeanOverall)
-    timeList.append(i)
-    qlog.write('%f\n' %(RateMeanL[i]))
-    i += 1
-print('%f' %kneePos)
-plt.plot(timeList, RateMeanL)
-plt.xlabel('Time')
-plt.show
-
-''' close log file '''
-if LOGGED:
-    qlog.close()
-   
-
-
-
 ''' start SimPy environment '''
 env = simpy.Environment()
 MyServer2 = Server2( env, SERVICE_DISCIPLINE )
 MyServer = Server( env,MyServer2, SERVICE_DISCIPLINE,MU1 ,MU2 )
 MyJobGenerator = JobGenerator( env, MyServer, POPULATION, LAMBDA, MU1 )
+''' start simulation '''
 env.run(MAXSIMTIME)
 MyServer.MeanJobInSystemComputing( kneePos)
 MyServer.VarOfJobInSystemComputing( kneePos)
 MyServer.ProbMoreThanNjobsComputing( ProN, kneePos)
 MeanJob = MyServer.MeanJobInSystem
 VarJob = MyServer.VarJobInSystem
-
-
-''' start simulation '''
-
-
-
-
-
+ProbJob = MyServer.ProbMoreThanNjobs
+print( 'Mean Jobs in System                     : %f' % (MeanJob) )
+print( 'Variance of Mean Jobs in System         : %f' % (VarJob) )
+print( 'Probability System has More than4 Jobs  : %f' % (ProbJob) )
 ''' print statistics '''
 RHO1 = LAMBDA1/MU1
 RHO2 = LAMBDA2/MU2
+print( 'Arrivals               : %d' % (MyServer.jobsDone) )
+print( 'Utilization            : %.2f/%.2f' 
+    % (1.0-MyServer.idleTime/MAXSIMTIME, RHO1) )
+print( 'Mean waiting time      : %.2f/%.2f' 
+    % (MyServer.waitingTime/MyServer.jobsDone, RHO1**2/((1-RHO1)*LAMBDA1) ) )
+
+print( 'Arrivals               : %d' % (MyServer2.jobsDone) )
+print( 'Utilization            : %.2f/%.2f'
+    % (1.0-MyServer2.idleTime/MAXSIMTIME, RHO2) )
+print( 'Mean waiting time      : %.2f/%.2f\n\n'
+    % (MyServer2.waitingTime/MyServer2.jobsDone, RHO2**2/((1-RHO2)*LAMBDA2) ) )
+
+
+
+'''Transient Remove'''
+EnvReps = list(())
+MyServer2 = list(())
+MyServer = list(())
+MyJobGeneration = list(())
+MeanJList  = list(())
+MeanLList  = list(())
+RateMeanList     = list(())
+MeanTimeLine    = list(())
+TerminateList = list(())
+ServerTimeLen = list(())
+MeanOverallRun = 0.0
+MeanOverall = 0.0
+MeanLdel = 0.0
+i = 0
+while(i < REPS):
+    EnvReps.append(simpy.Environment())
+    MyServer2.append(Server2( EnvReps[i], SERVICE_DISCIPLINE ))
+    MyServer.append(Server( EnvReps[i],MyServer2[i], SERVICE_DISCIPLINE,MU1 ,MU2 ))
+    MyJobGeneration.append(JobGenerator( EnvReps[i], MyServer[i], POPULATION, LAMBDA, MU1 ))
+    env = EnvReps[i]
+    env.run(until = MAXSIMTIME)
+    ServerTimeLen.append(len(MyServer[i].queuetime))
+    '''print('%d' %thisRepsQueueLen)'''
+    j = 0
+    timeRun = 0
+    timesRun = 1
+    lengthSumRun = 0.0
+    TerminateSumRun = 0.0
+    while(j < ServerTimeLen[i]):
+        if(MyServer[i].queuetime[j] >= timeRun + 1) :
+            if(i > 0):
+                 MeanJList[timeRun] += lengthSumRun / (timesRun*REPS)
+            else:
+                 MeanJList.append(lengthSumRun / (timesRun*REPS))
+            lengthSumRun = MyServer[i].queuelength[j]
+            timeRun += 1
+            timesRun = 1
+        else:
+            lengthSumRun += MyServer[i].queuelength[j]
+            timesRun += 1
+        TerminateSumRun += MyServer[i].queuelength[j]
+        j += 1 
+    TerminateList.append(TerminateSumRun)
+    if(i > 0):
+        MeanJList[MAXSIMTIME - 1] += lengthSumRun / (timesRun*REPS)
+    else:
+        MeanJList.append(lengthSumRun / (timesRun*REPS))
+    i += 1
+
+'''-----------OPEN FILE TO PRINT------------'''
+if LOGGED:
+    qlog = open( 'mm1-l%d-m%d.csv' % (LAMBDA,MU1), 'w' )
+    qlog.write( '0\t0\t0\n' )
+'''-----------MEAN OVERALL------------'''
+i = 0
+while i < MAXSIMTIME :
+    MeanOverallRun += MeanJList[i]
+    i += 1
+'---------------------------------------'
+MeanOverall = MeanOverallRun*1.0/MAXSIMTIME    
+qlog.write('%f\n' %(MeanOverall))
+'---MEAN DELETE FIRST L OBSERVATION(S)---'
+i = 0
+setKnee = True
+while i < MAXSIMTIME - 1 :
+    MeanOverallRun -= MeanJList[i]
+    MeanLList.append(MeanOverallRun/(MAXSIMTIME - i))
+    RateMeanList.append((MeanLList[i] - MeanOverall)/MeanOverall)
+    MeanTimeLine.append(i)
+    qlog.write('%f\t' %(MeanJList[i]))
+    qlog.write('%f\t' %(MeanLList[i]))
+    qlog.write('%f\n' %(RateMeanList[i]))
+    if(setKnee):
+        if((i > 0) & (abs(RateMeanList[i]  - RateMeanList[i - 1]) < kneeDeltaRate)) :
+            qlog.write('%f\n' %(abs(RateMeanList[i]  - RateMeanList[i - 1])))
+            kneePos = i
+            setKnee = False
+    i += 1
+print('Knee: %d\n\n' %kneePos)
+plt.plot(MeanTimeLine, RateMeanList)
+plt.xlabel('Time')
+plt.show
+
+'''---TERMINATING SIMULATIONS'''
+MeanTerminateValue = 0.0
+VarTerminateValue = 0.0
+i = 0
+while(i < REPS):
+    j = 0
+    while(MyServer[i].queuetime[j] < kneePos):
+        TerminateList[i] -= MyServer[i].queuelength[j]
+        ServerTimeLen[i] -= 1
+        j += 1
+    TerminateList[i] = TerminateList[i] / ServerTimeLen[i]
+    MeanTerminateValue += TerminateList[i]
+    i += 1
+MeanTerminateValue /= REPS
+i = 0
+while(i < REPS):
+    VarTerminateValue += (TerminateList[i] - MeanTerminateValue)**2
+    i += 1
+VarTerminateValue /= (REPS-1)
+VarTerminateValue = math.sqrt(VarTerminateValue)
+z = ss.norm.ppf(1 - alpha/2)
+delta = VarTerminateValue * z
+print( 'Confidence Interval: [ %f - %f : %f + %f ]' 
+            % (MeanTerminateValue, delta ,MeanTerminateValue, delta) )
+
+''' close log file '''
+if LOGGED:
+    qlog.close()
+   
+
+''' start SimPy environment '''
+env = simpy.Environment()
+MyServer2 = Server2( env, SERVICE_DISCIPLINE )
+MyServer = Server( env,MyServer2, SERVICE_DISCIPLINE,MU1 ,MU2 )
+MyJobGenerator = JobGenerator( env, MyServer, POPULATION, LAMBDA, MU1 )
+''' start simulation '''
+env.run(MAXSIMTIME)
+MyServer.MeanJobInSystemComputing( kneePos)
+MyServer.VarOfJobInSystemComputing( kneePos)
+MyServer.ProbMoreThanNjobsComputing( ProN, kneePos)
+MeanJob = MyServer.MeanJobInSystem
+VarJob = MyServer.VarJobInSystem
+ProbJob = MyServer.ProbMoreThanNjobs
+print( 'Mean Jobs in System                     : %f' % (MeanJob) )
+print( 'Variance of Mean Jobs in System         : %f' % (VarJob) )
+print( 'Probability System has More than4 Jobs  : %f' % (ProbJob) )
+
+''' print statistics '''
 print( 'Arrivals               : %d' % (MyServer.jobsDone) )
 print( 'Utilization            : %.2f/%.2f' 
     % (1.0-MyServer.idleTime/MAXSIMTIME, RHO1) )
