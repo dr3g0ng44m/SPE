@@ -1,0 +1,591 @@
+﻿\documentclass[a4paper]{article}
+\usepackage{vntex}
+%\usepackage[english,vietnam]{babel}
+%\usepackage[utf8]{inputenc}
+
+%\usepackage[utf8]{inputenc}
+%\usepackage[francais]{babel}
+\usepackage{a4wide,amssymb,epsfig,latexsym,multicol,array,hhline,fancyhdr}
+
+\usepackage{amsmath}
+\usepackage{lastpage}
+\usepackage[lined,boxed,commentsnumbered]{algorithm2e}
+\usepackage{enumerate}
+\usepackage{color}
+\usepackage{graphicx}							% Standard graphics package
+\usepackage{array}
+\usepackage{tabularx, caption}
+\usepackage{multirow}
+\usepackage{multicol}
+\usepackage{rotating}
+\usepackage{graphics}
+\usepackage[left = 2.5cm, right = 2cm]{geometry}
+\usepackage{setspace}
+\usepackage{epsfig}
+\usepackage{tikz}
+\usetikzlibrary{arrows,snakes,backgrounds}
+\usepackage{hyperref}
+\hypersetup{urlcolor=blue,linkcolor=black,citecolor=black,colorlinks=true} 
+%\usepackage{pstcol} 								% PSTricks with the standard color package
+
+\newtheorem{theorem}{{\bf Định lý}}
+\newtheorem{property}{{\bf Tính chất}}
+\newtheorem{proposition}{{\bf Mệnh đề}}
+\newtheorem{corollary}[proposition]{{\bf Hệ quả}}
+\newtheorem{lemma}[proposition]{{\bf Bổ đề}}
+
+
+%\usepackage{fancyhdr}
+\setlength{\headheight}{40pt}
+\pagestyle{fancy}
+\fancyhead{} % clear all header fields
+\fancyhead[L]{
+ \begin{tabular}{rl}
+    \begin{picture}(25,15)(0,0)
+    \put(0,-8){\includegraphics[width=8mm, height=8mm]{hcmut.png}}
+    %\put(0,-8){\epsfig{width=10mm,figure=hcmut.eps}}
+   \end{picture}&
+	%\includegraphics[width=8mm, height=8mm]{hcmut.png} & %
+	\begin{tabular}{l}
+		\textbf{\bf \ttfamily Trường Đại Học Bách Khoa Tp.Hồ Chí Minh}\\
+		\textbf{\bf \ttfamily Khoa Khoa Học và Kỹ Thuật Máy Tính}
+	\end{tabular} 	
+ \end{tabular}
+}
+\fancyhead[R]{
+	\begin{tabular}{l}
+		\tiny \bf \\
+		\tiny \bf 
+	\end{tabular}  }
+\fancyfoot{} % clear all footer fields
+\fancyfoot[L]{\scriptsize \ttfamily 2019 - 2020}
+\fancyfoot[R]{\scriptsize \ttfamily Trang {\thepage}/\pageref{LastPage}}
+\renewcommand{\headrulewidth}{0.3pt}
+\renewcommand{\footrulewidth}{0.3pt}
+
+
+%%%
+\setcounter{secnumdepth}{4}
+\setcounter{tocdepth}{3}
+\makeatletter
+\newcounter {subsubsubsection}[subsubsection]
+\renewcommand\thesubsubsubsection{\thesubsubsection .\@alph\c@subsubsubsection}
+\newcommand\subsubsubsection{\@startsection{subsubsubsection}{4}{\z@}%
+                                     {-3.25ex\@plus -1ex \@minus -.2ex}%
+                                     {1.5ex \@plus .2ex}%
+                                     {\normalfont\normalsize\bfseries}}
+\newcommand*\l@subsubsubsection{\@dottedtocline{3}{10.0em}{4.1em}}
+\usepackage{listings}
+\usepackage{color}
+
+\definecolor{dkgreen}{rgb}{0,0.6,0}
+\definecolor{gray}{rgb}{0.5,0.5,0.5}
+\definecolor{mauve}{rgb}{0.58,0,0.82}
+
+\lstset{frame=tb,
+  language=Python,
+  aboveskip=3mm,
+  belowskip=3mm,
+  showstringspaces=false,
+  columns=flexible,
+  basicstyle={\small\ttfamily},
+  numbers=none,
+  numberstyle=\tiny\color{gray},
+  keywordstyle=\color{blue},
+  commentstyle=\color{dkgreen},
+  stringstyle=\color{mauve},
+  breaklines=true,
+  breakatwhitespace=true,
+  tabsize=3
+}
+\newcommand*{\subsubsubsectionmark}[1]{}
+\makeatother
+
+\begin{document}
+\begin{titlepage}
+\begin{center}
+\large ĐẠI HỌC QUỐC GIA THÀNH PHỐ HỒ CHÍ MINH \\
+TRƯỜNG ĐẠI HỌC BÁCH KHOA \\
+KHOA KHOA HỌC & KỸ THUẬT MÁY TÍNH 
+\end{center}
+
+\vspace{1cm}
+
+\begin{figure}[h!]
+\begin{center}
+\includegraphics[width=3cm]{hcmut.png}
+\end{center}
+\end{figure}
+
+\vspace{1cm}
+
+\begin{center}
+\begin{tabular}{c}
+\textbf{{\Large{ ĐÁNH GIÁ HIỆU NĂNG HỆ THỐNG}}}\\
+~~\\
+\hline
+\hline
+\\
+\vspace{0.5cm}
+\textbf{{\Huge BÀI TẬP LỚN }}\\
+
+\textbf{{\LARGE Mô phỏng hệ thống hàng dùng Simpy}}\\
+\\
+\textbf{{\LARGE Chủ đề 7 }}\\
+\\
+\hline
+\hline
+\end{tabular}
+\end{center}
+
+\vspace{1.5 cm}
+
+\begin{table}[h]
+
+\begin{tabular}{rrl}
+
+\hspace{6 cm} & \Large  \textbf{GVHD:} & \Large \textbf{Trần Văn Hoài}\\
+\hspace{6 cm} & \Large  \textbf{Thành viên :} & \Large Đặng Hữu Nam - 1720034\\
+\hspace{6 cm} & \Large& \Large Võ Nguyễn Phi Long - 1712033\\
+\hspace{6 cm} & \Large& \Large Từ Nguyên Gia Khiêm - 1711754
+
+\end{tabular}
+\end{table}
+
+\vspace{1.3cm}
+
+\begin{center}
+{\large TP. HỒ CHÍ MINH, THÁNG 12/2019}
+\end{center}
+\end{titlepage}
+
+
+%\thispagestyle{empty}
+
+\newpage \tableofcontents
+%\newpage \listoffigures
+% \newpage \listoftables
+
+\newpage
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Giới thiệu}
+{
+ \textbf{Chủ đề 8}:\\
+ Mạng 2 hàng Q_{1} = M/M($\mu_{1}$)/1, Q_{2} = M/M($\mu_{2}$)/1,  trong đó $Q_{1}\rightarrow{}Q_{2}$ với  $p_{12}$ = 0.8; $Q_{1}\rightarrow{}Q_{1}$ với $p_{11}$ = 0.2; quá trình đến $Q_{1}$ với $\lambda$, công việc sau khi qua $Q_{2}$, sẽ rời khỏi hệ thống. 
+ \begin{figure}[h!]
+\begin{center}
+\includegraphics[width=15cm]{system.png}
+\end{center}
+\end{figure}
+
+}
+\section{Quá trình đánh giá hiệu năng hệ thống}
+{
+
+\subsection{Xác định các mục tiêu và Định nghĩa Hệ thống}
+{
+    \begin{itemize}
+    \item \textbf {Mục tiêu:} Mô phỏng hoạt động của Hệ thống hàng bằng Simpy trong một khoảng thời gian nhất định và Đánh giá độ chính xác của quá trình mô phỏng so với Lý thuyết.
+    \item \textbf {System:} Một hệ thống hàng gồm 2 hàng đơn M/M/1 $Q_{1}$ và $Q_{2}$; mỗi hàng đợi đều có riêng service rate ($\mu_{1}$) và ($\mu_{2}$); Job sau khi rời khỏi $Q_{1}$ hoặc quay trở lại $Q_{1}$ với $p_{11}$ = 0.2 hoặc tới $Q_{2}$ với $p_{2}$ = 0.2 sau đó rời khỏi hệ thống. 
+    \end{itemize}
+}
+\subsection{Các Chức năng và Kết quả có thể thu được của Hệ thống}
+{
+	\begin{itemize}
+	    \item \textbf{ Chức năng:} 
+	    \begin{itemize}
+	        \item Đưa một Job vào trong System
+	        \item Thực hiện Job
+	        \item Kết thúc và Đưa Job rời khỏi hệ thống
+	    \end{itemize}
+	    \item \textbf{ Các kết quả có thể xảy ra:: }
+	    \begin{itemize}
+	        \item Job được thực hiện thành công và rời khỏi hệ thống
+	        \item Job đang chờ trong $Q_{1}$
+	        \item Job đang chờ trong $Q_{2}$
+	        \item Job vẫn đang được thực hiện trong $Q_{1}$
+	        \item Job vẫn đang được thực hiện trong $Q_{2}$
+	    \end{itemize}
+	\end{itemize}
+}
+\subsection{Lựa chọn Metrics:}
+{
+    \begin{itemize}
+        \item  Hiệu suất sử dụng hệ thống ( Utilization )
+        \item Thời gian phục vụ trung bình của hệ thống ( Mean service time )
+        \item Số lượng Job trung bình nằm trong hệ thống ( Mean Job in System )
+        \item Thời gian đợi trung bình của các Job được đã được thực hiện ( Mean Waiting time of Jobs )
+        \item Phương sai của số lượng Job trung bình nằm trong hệ thống (Variance of Job in System)
+    \end{itemize}
+}
+\subsection{Danh sách các Parameters}
+{
+	\subsubsection{Parameter của Hệ thống}
+	{
+	    \begin{itemize}
+	        \item \textbf{Service rate của Server 1} : $\mu_{1}$
+	        \item \textbf{Service rate của Server 2} : $\mu_{2}$
+	    \end{itemize}
+	}
+	\subsubsection{Parameter của Tải công việc}
+	{
+	    \begin{itemize}
+	        \item \textbf{Arrival rate của Server 1} : $\lambda_{1}$
+	        \item \textbf{Tổng đơn vị thời gian mô phỏng} : MAXTIME
+	        \item  \textbf{Số lần lấy mẫu cho Transient Remove và Terminating Simulation} : REPS
+	        \item \textbf{Số lượng Job N để tính xác suất có nhiều hơn N Job trong hệ thống} : ProN
+	        \item \textbf{Knee được xác định bởi Tan= delta(lenght of queue)/delta(time)} : kneePos
+	        \item \textbf{Độ tin cậy 1-alpha} : alpha
+	        \item \textbf{Nguyên tắc quản lý các Job trong queue} : SERVICE$_$DISCIPLINE
+	        \item \textbf{Số Job tối đa có thể phục vụ} : POPULATION
+	    \end{itemize}
+	}
+}
+\subsection{Các nhân tố cần khảo sát}
+{
+	    \begin{itemize}
+	        \item \textbf{Service rate của Server 1} : $\mu_{1}$
+	        \item \textbf{Service rate của Server 2} : $\mu_{2}$
+	        \item \textbf{Arrival rate của Server 1} : $\lambda_{1}$
+	        \item \textbf{Tổng đơn vị thời gian mô phỏng} : MAXTIME
+	        \item  \textbf{Số lần lấy mẫu cho Transient Remove và Terminating Simulation} : M
+	        \item \textbf{Số lượng Job N để tính xác suất có nhiều hơn N Job trong hệ thống} : N
+	        \item \textbf{Knee được xác định bởi Tan= delta(lenght of queue)/delta(time)} : kneePos
+	        \item \textbf{Độ tin cậy 1-alpha} : alpha
+	    \end{itemize}
+}
+\subsection{Lựa chọn kỹ thuật đánh giá}
+{
+	- Kĩ thuật đánh giá : 
+	    \begin{itemize}
+	        \item Mô phỏng bằng ngôn ngữ lập trình Python thông qua Simpy
+	        \item Validation
+	        \item \textbf{Transient Remove:} Initial Data Deletion
+	        \item \textbf{Terminating Simulation:} Independent Replications
+	    \end{itemize}
+
+}
+\subsection{Lựa chọn Workload}
+{
+    \begin{itemize}
+            \item Arrival rate $\lambda$
+            \item JobGenerator với arrival time là phân phối mu
+            \item Số lần lấy mẫu M
+            \item Tổng đơn vị thời gian lấy mẫu : MAXTIME
+    \end{itemize}
+}
+\newpage
+\subsection{Design Experiments}
+{
+	- Mô phỏng được thiết kế bằng ngôn ngữ python:
+	
+	\subsubsection{Danh sách các package được sử dụng}
+	{
+    \begin{lstlisting}
+import simpy
+#import random
+import numpy.random as random
+import scipy.stats as ss
+import math
+import matplotlib.pyplot as plt
+    \end{lstlisting}
+    }
+\subsubsection{List parameter}
+	{
+	\begin{lstlisting}
+''' ------------------------ '''
+''' Parameters               '''
+''' ------------------------ '''
+'Max Simulation Time'
+MAXSIMTIME = 5000 
+' "True"  Print to terminal'
+VERBOSE = False 
+'Queue Changing Rate'
+P11 = 0.2
+P12 = 1-P11
+'Original Arrival & Service Rate'
+LAMBDA = 9.0
+MU1 = 12.0
+MU2 = 12.0
+'Fixed Arrival Rate'
+'Lambda1=10'
+'Lambda2=8'
+LAMBDA1 = LAMBDA/P12
+LAMBDA2 = LAMBDA
+'------------'
+POPULATION = 50000000
+SERVICE_DISCIPLINE = 'FIFO'
+'Open file to Write or Not'
+LOGGED = True
+'Probability Job Queue has more than ProN job(s)'
+ProN = 4.0 
+'Number of Replications'
+REPS = 10
+'Identify the knee'
+kneeDeltaRate = 0.00005 
+INTER_SERVICE_TIME_1 = 1/MU1
+INTER_SERVICE_TIME_2 = 1/MU2
+'Convenience Level'
+Confidence = 0.95
+alpha = 1 - Confidence 
+    \end{lstlisting}
+    }
+	\subsubsection{Định nghĩa Job: Job}
+	{
+	\begin{lstlisting}
+    class Job:
+    def __init__(self, name, arrtime, duration):
+        self.name = name
+        self.arrtime = arrtime
+        self.duration = duration
+
+    def __str__(self):
+        return '%s at %d, length %d' %(self.name, self.arrtime, self.duration)
+
+    def SJF( job ):
+        return job.duration
+    \end{lstlisting}
+    }
+	\subsubsection{Định nghĩa Server1:}
+	{
+	\begin{lstlisting}
+   def MeanJobInSystemComputing(self, k):
+        i = k
+        JobxTime = 0
+        while i < len(self.queuetime) - 1:
+                JobxTime += self.systemJob[i] * (self.queuetime[i+1] - self.queuetime[i])
+                i += 1
+        self.MeanJobInSystem = JobxTime/(MAXSIMTIME - self.queuetime[k])  
+    def VarOfJobInSystemComputing(self, k):
+        i = k
+        SquaredDeltaJobxTime = 0
+        while i < len(self.queuetime) - 1:
+                SquaredDeltaJobxTime += ((self.systemJob[i] - self.MeanJobInSystem)**2)  * (self.queuetime[i+1] - self.queuetime[i-1])
+                i += 1
+        self.VarJobInSystem = SquaredDeltaJobxTime/(MAXSIMTIME - self.queuetime[k])          
+    def ProbMoreThanNjobsComputing(self, N, k):
+        i = k
+        totalTime = 0
+        while i < len(self.queuetime) - 1:
+            if self.systemJob[i] > N:
+                totalTime += self.queuetime[i+1] - self.queuetime[i-1]
+            i += 1
+        self.ProbMoreThanNjobs = totalTime/(MAXSIMTIME - self.queuetime[k]) 
+
+    \end{lstlisting}
+	}
+	}
+\subsection{Analyze and Interpret Data}
+{
+\subsubsection{Start simulation}
+    \begin{lstlisting}
+''' start SimPy environment '''
+''' kneePos is the Position of knee defined by transient remove'''
+''' we first simulate and once again after transient remove to find difference '''
+env = simpy.Environment()
+MyServer2 = Server2( env, SERVICE_DISCIPLINE )
+MyServer = Server( env,MyServer2, SERVICE_DISCIPLINE,MU1 ,MU2 )
+MyJobGenerator = JobGenerator( env, MyServer, POPULATION, LAMBDA, MU1 )
+''' start simulation '''
+env.run(MAXSIMTIME)
+MyServer.MeanJobInSystemComputing( kneePos)
+MyServer.VarOfJobInSystemComputing( kneePos)
+MyServer.ProbMoreThanNjobsComputing( ProN, kneePos)
+MeanJob = MyServer.MeanJobInSystem
+VarJob = MyServer.VarJobInSystem
+ProbJob = MyServer.ProbMoreThanNjobs
+    \end{lstlisting}
+\subsubsection{Transient removal}
+{
+    \begin{lstlisting}
+'''Transient Remove'''
+EnvReps = list(())
+MyServer2 = list(())
+MyServer = list(())
+MyJobGeneration = list(())
+MeanJList  = list(())
+MeanLList  = list(())
+RateMeanList     = list(())
+MeanTimeLine    = list(())
+TerminateList = list(())
+ServerTimeLen = list(())
+MeanOverallRun = 0.0
+MeanOverall = 0.0
+MeanLdel = 0.0
+i = 0
+while(i < REPS):
+    EnvReps.append(simpy.Environment())
+    MyServer2.append(Server2( EnvReps[i], SERVICE_DISCIPLINE ))
+    MyServer.append(Server( EnvReps[i],MyServer2[i], SERVICE_DISCIPLINE,MU1 ,MU2 ))
+    MyJobGeneration.append(JobGenerator( EnvReps[i], MyServer[i], POPULATION, LAMBDA, MU1 ))
+    env = EnvReps[i]
+    env.run(until = MAXSIMTIME)
+    ServerTimeLen.append(len(MyServer[i].queuetime))
+    '''print('%d' %thisRepsQueueLen)'''
+    j = 0
+    timeRun = 0
+    timesRun = 1
+    lengthSumRun = 0.0
+    TerminateSumRun = 0.0
+    while(j < ServerTimeLen[i]):
+        if(MyServer[i].queuetime[j] >= timeRun + 1) :
+            if(i > 0):
+                 MeanJList[timeRun] += lengthSumRun / (timesRun*REPS)
+            else:
+                 MeanJList.append(lengthSumRun / (timesRun*REPS))
+            lengthSumRun = MyServer[i].queuelength[j]
+            timeRun += 1
+            timesRun = 1
+        else:
+            lengthSumRun += MyServer[i].queuelength[j]
+            timesRun += 1
+        TerminateSumRun += MyServer[i].queuelength[j]
+        j += 1 
+    TerminateList.append(TerminateSumRun)
+    if(i > 0):
+        MeanJList[MAXSIMTIME - 1] += lengthSumRun / (timesRun*REPS)
+    else:
+        MeanJList.append(lengthSumRun / (timesRun*REPS))
+    i += 1
+
+'''-----------OPEN FILE TO PRINT------------'''
+if LOGGED:
+    qlog = open( 'mm1-l%d-m%d.csv' % (LAMBDA,MU1), 'w' )
+    qlog.write( '0\t0\t0\n' )
+'''-----------MEAN OVERALL------------'''
+i = 0
+while i < MAXSIMTIME :
+    MeanOverallRun += MeanJList[i]
+    i += 1
+'---------------------------------------'
+MeanOverall = MeanOverallRun*1.0/MAXSIMTIME    
+qlog.write('%f\n' %(MeanOverall))
+'---MEAN DELETE FIRST L OBSERVATION(S)---'
+i = 0
+setKnee = True
+while i < MAXSIMTIME - 1 :
+    MeanOverallRun -= MeanJList[i]
+    MeanLList.append(MeanOverallRun/(MAXSIMTIME - i))
+    RateMeanList.append((MeanLList[i] - MeanOverall)/MeanOverall)
+    MeanTimeLine.append(i)
+    qlog.write('%f\t' %(MeanJList[i]))
+    qlog.write('%f\t' %(MeanLList[i]))
+    qlog.write('%f\n' %(RateMeanList[i]))
+    if(setKnee):
+        if((i > 0) & (abs(RateMeanList[i]  - RateMeanList[i - 1]) < kneeDeltaRate)) :
+            qlog.write('%f\n' %(abs(RateMeanList[i]  - RateMeanList[i - 1])))
+            kneePos = i
+            setKnee = False
+    i += 1
+print('Knee: %d\n\n' %kneePos)
+plt.plot(MeanTimeLine, RateMeanList)
+plt.xlabel('Time')
+plt.ylabel('RateMean')
+plt.show
+    \end{lstlisting}
+}
+
+\subsubsection{Show outcome}
+    \begin{lstlisting}
+print( 'Queue 1')
+print( 'Mean Jobs in System                     : %f' % (MeanJob) )
+print( 'Variance of Mean Jobs in System         : %f' % (VarJob) )
+print( 'Probability System has More than4 Jobs  : %f' % (ProbJob) )
+''' print statistics '''
+RHO1 = LAMBDA1/MU1
+RHO2 = LAMBDA2/MU2
+print( 'Arrivals               : %d' % (MyServer.jobsDone) )
+print( 'Utilization            : %.2f/%.2f' 
+    % (1.0-MyServer.idleTime/MAXSIMTIME, RHO1) )
+print( 'Mean waiting time      : %.2f/%.2f' 
+    % (MyServer.waitingTime/MyServer.jobsDone, RHO1**2/((1-RHO1)*LAMBDA1) ) )
+print( 'Queue 2')
+print( 'Arrivals               : %d' % (MyServer2.jobsDone) )
+print( 'Utilization            : %.2f/%.2f'
+    % (1.0-MyServer2.idleTime/MAXSIMTIME, RHO2) )
+print( 'Mean waiting time      : %.2f/%.2f\n\n'
+    % (MyServer2.waitingTime/MyServer2.jobsDone, RHO2**2/((1-RHO2)*LAMBDA2) ) )
+    \end{lstlisting}
+\newpage
+\subsection{Present Results}
+{
+    \item \textbf{System & Workload Parameter}.
+    \begin{figure}[h!]
+    \begin{center}
+    \includegraphics[width=10cm, height=8cm]{para.png}
+    \end{center}
+    \end{figure}
+    \item \textbf{On Computer}
+    \begin{figure}[h!]
+    \begin{center}
+    \includegraphics[width=10cm, height=8cm]{OnVisual.png}
+    \end{center}
+    \end{figure}
+    \newpage
+    \item \textbf{Queue 1}
+    \begin{figure}[h!]
+    \begin{center}
+    \includegraphics[width=10cm]{Queue1.png}
+    \end{center}
+    \end{figure}
+    \item \textbf{Queue 2}
+    \begin{figure}[h!]
+    \begin{center}
+    \includegraphics[width=10cm]{Queue2.png}
+    \end{center}
+    \end{figure}
+    \newpage
+    \item \textbf{Lambda = 2}
+    \begin{figure}[h!]
+    \begin{center}
+    \includegraphics[width=10cm]{lambda2.png}
+    \end{center}
+    \end{figure}
+    \begin{figure}[h!]
+    \begin{center}
+    \includegraphics[width=10cm]{2lambda.png}
+    \end{center}
+    \end{figure}
+    \newpage
+    \item \textbf{Lambda = 5}
+    \begin{figure}[h!]
+    \begin{center}
+    \includegraphics[width=10cm]{lambda5.png}
+    \end{center}
+    \end{figure}
+    \begin{figure}[h!]
+    \begin{center}
+    \includegraphics[width=10cm]{5lambda.png}
+    \end{center}
+    \end{figure}
+    \newpage
+    \item \textbf{Lambda = 9}
+    \begin{figure}[h!]
+    \begin{center}
+    \includegraphics[width=10cm]{lambda9.png}
+    \end{center}
+    \end{figure}
+    \begin{figure}[h!]
+    \begin{center}
+    \includegraphics[width=10cm]{9lambda.png}
+    \end{center}
+    \end{figure}
+}
+\newpage
+\subsection{Conclusion}
+{
+        \begin{itemize}
+            \item Queue 2 là một hệ thống M/M/1 không có hồi tiếp nên các Metrics thu được từ mô phỏng gần như đúng với Lý thuyết;
+            \item Queue 1 là một hệ thống M/M/1 có hồi tiếp, dẫn đến kết quả của các Metric thu được có phần chênh lệch so với lý thuyết, nguyên nhân này là do arrival rate của Queue 1 bị thay đổi, không còn đảm bảo phân phối mũ như ban đầu;
+            \item Transient Remove với timeslice là 1 (đơn vị thời gian), tương đối lớn so với khoảng thời gian cho 1 lần Job Generating ($\sim$ 10-14 lần / s); điều này làm hiệu quả của Transient Remove không được biểu hiện rõ ràng trong quá trình mô phỏng;
+            \item Independent Replications cho kết quả tương đối chính xác, phù hợp với kết quả quan sát được từ quá trình mô phỏng
+    \end{itemize}
+}
+\mbox{}
+\vfill
+\textbf{{\Huge THANKS FOR YOUR ATTENTION }}\\
+}
+}
+\end{document}
+https://www.overleaf.com/project/5de5e3ee0045f400019fe6d9
