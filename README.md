@@ -14,4 +14,4 @@ M/M/1 queue model:\
 -The number of server is one.\
 -Although not explicitly stated both the population and the queue size can be infinity.\
 -The order of service is assumed to be FIFO.\
-Calculating Formula of Theoritical System Configuration: https://virtuaq.com/blog/2017-11-23-basics-of-queuing-theory\
+* Item 9 Calculating Formula of Theoritical System Configuration: https://virtuaq.com/blog/2017-11-23-basics-of-queuing-theory\
